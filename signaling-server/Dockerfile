@@ -10,6 +10,9 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Install Python and build tools required by node-gyp to compile @signalapp/libsignal-client
+RUN apk add --no-cache python3 make g++
+
 # Install dependencies first so this layer is cached unless
 # package.json/package-lock.json change.
 COPY package*.json ./
