@@ -16,6 +16,6 @@ package com.notrace.messenger.network.signaling
  * place beats inventing a second plain SharedPreferences file.
  */
 object SignalingDefaults {
-    /** Local emulator testing default, per network_security_config.xml's 10.0.2.2 exception. */
+    const val PRODUCTION_URL = "wss://notrace-mess.onrender.com"
     const val LOCAL_EMULATOR_URL = "ws://10.0.2.2:8080"
 }
