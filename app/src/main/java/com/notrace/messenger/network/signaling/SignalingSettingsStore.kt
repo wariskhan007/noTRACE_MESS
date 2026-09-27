@@ -11,7 +11,9 @@ import android.content.Context
 class SignalingSettingsStore(context: Context) {
     private val prefs = context.getSharedPreferences("notrace_settings", Context.MODE_PRIVATE)
 
-    fun getServerUrl(): String = prefs.getString(KEY_SERVER_URL, "") ?: ""
+    fun getServerUrl(): String =
+        prefs.getString(KEY_SERVER_URL, "wss://notrace-mess.onrender.com")
+            ?: "wss://notrace-mess.onrender.com"
 
     fun setServerUrl(url: String) {
         prefs.edit().putString(KEY_SERVER_URL, url.trim()).apply()
