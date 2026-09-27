@@ -24,16 +24,44 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses || true
+      # Verifies gradle/wrapper/gradle-wrapper.jar against Gradle's own
+      # published checksums, so CI fails loudly if that binary is ever
+      # tampered with or corrupted, instead of silently running an
+      # unverified jar.
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
 
+      # Replaces the old "yes | sdkmanager --licenses || true" step.
+      # That relied on sdkmanager already being on PATH on the runner
+      # image (not guaranteed to stay true) and the "|| true" silently
+      # swallowed any failure instead of fixing it - so a license or
+      # SDK-location problem would only surface later, confusingly, at
+      # the build step. This action installs the SDK commandline tools
+      # itself if needed and explicitly accepts the licenses.
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          # Default is just "tools platform-tools" - add the exact
+          # platform and build-tools this project's compileSdk (34)
+          # needs, so the Gradle build never has to auto-download them
+          # mid-build.
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+
+      # Enables Gradle's dependency/build caching between runs. No
+      # gradle-version input is passed here on purpose: with a
+      # committed wrapper (gradle/wrapper/gradle-wrapper.properties),
+      # ./gradlew always uses the exact Gradle version pinned there,
+      # which is what should drive the version - not a second,
+      # separately-maintained number in this workflow file.
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
 
-      - name: Build Debug APK with Info Logging
-        run: gradle assembleDebug --no-daemon --stacktrace --info -x lint -Dorg.gradle.jvmargs="-Xmx2048m"
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        env:
+          # Keeps this in one place instead of a shell-quoted -D flag
+          # buried in the run command.
+          GRADLE_OPTS: '-Dorg.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8'
 
       - name: Show generated APK
         run: find app/build/outputs/apk -type f -name "*.apk" -print
