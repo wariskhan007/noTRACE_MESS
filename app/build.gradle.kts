@@ -119,7 +119,7 @@ dependencies {
     // mature, widely audited encrypted-SQLite implementation rather
     // than a homegrown encrypt-on-write layer (plan rule #4 "never
     // invent cryptography").
-    implementation("net.zetetic:android-database-sqlcipher:4.5.6")
+    implementation("net.zetetic:android-database-sqlcipher:4.5.4")
     implementation("androidx.sqlite:sqlite:2.4.0")
 
     // Jetpack Security: Keystore-backed MasterKey + EncryptedSharedPreferences
