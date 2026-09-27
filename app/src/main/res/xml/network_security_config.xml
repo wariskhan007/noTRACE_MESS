@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Phase 5: by default Android blocks plaintext (non-TLS) network
+    traffic on API 28+. Production signaling should always be wss://
+    (Render.com gives this automatically - see signaling-server/README.md),
+    so the base config below keeps cleartext blocked everywhere.
+
+    The ONE exception is 10.0.2.2 - the fixed address an Android
+    EMULATOR uses to reach its host machine - so a locally-running
+    `npm start` signaling server can be tested during development
+    without deploying anything. This does not weaken security on a
+    real device talking to a real deployed server: 10.0.2.2 only means
+    anything inside the emulator's virtual network.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>

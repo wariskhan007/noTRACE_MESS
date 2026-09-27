@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">NoTrace</string>
+    <string name="onboarding_title">Welcome to NoTrace</string>
+    <string name="onboarding_body">A privacy-first messenger. Messages are end-to-end encrypted. There is no account recovery: if you lose this device without a working backup path, your conversations cannot be restored. Reinstalling creates a brand-new identity.</string>
+    <string name="placeholder_phase1">Phase 1 scaffold — identity, contacts, and messaging arrive in later phases.</string>
+</resources>

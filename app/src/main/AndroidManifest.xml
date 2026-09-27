@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Phase 1: no permissions requested yet. NoTrace requests permissions
+        only when the feature that needs them lands (plan Section 24 #, and
+        plan rule #6 "Request only necessary Android permissions"):
+          - INTERNET: added in Phase 5 (signaling/P2P)
+          - CAMERA: Phase 7 ended up not needing this (attachments use
+            the system file picker, not in-app capture) - added in
+            Phase 9 (video calls) instead
+          - RECORD_AUDIO: added in Phase 8 (voice notes/calls)
+          - POST_NOTIFICATIONS: added in Phase 8, for the ongoing-call
+            foreground service notification (also usable later for
+            message notifications without a further permission add)
+    -->
+
+    <!--
+        Phase 5: first real permission requested, for the signaling
+        connection (WebSocket) and WebRTC's P2P/TURN traffic (plan rule
+        "request only necessary Android permissions - add one at a
+        time with justification").
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Originally added in Phase 5 for basic connectivity checks;
+         Phase 12 also uses this for NetworkMonitor's event-driven
+         reconnect-on-network-restore callback - no new permission
+         needed, the existing grant already covers it. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!--
+        Phase 7 (media/attachments) deliberately requests NO new
+        permission either: picking a file to send uses the system
+        Storage Access Framework (OpenDocument), and saving a received
+        file uses CreateDocument - both grant per-file, temporary access
+        without any broad READ_MEDIA_*/READ_EXTERNAL_STORAGE permission
+        (plan rule: "do not request broad file-management access").
+
+        Phase 8: microphone for voice notes and audio calls. Requested
+        at runtime right before the first recording/call action, never
+        eagerly at launch. FOREGROUND_SERVICE(_MICROPHONE) lets an
+        active call keep running (and its mic use stay visible via the
+        system's own privacy indicator) if the user backgrounds the
+        app mid-call - plan rule "foreground services only when
+        genuinely necessary"; an ongoing call is exactly that case.
+    -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!--
+        Camera and FOREGROUND_SERVICE_CAMERA (Phase 9): requested at
+        runtime only when the user actually starts/accepts a VIDEO
+        call - never for an audio-only call, and never eagerly.
+    -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+
+    <application
+        android:name=".NoTraceApplication"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.NoTrace"
+        android:supportsRtl="true"
+        tools:targetApi="34"
+        xmlns:tools="http://schemas.android.com/tools">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.NoTrace">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+            Minimal foreground service: shows a persistent "Ongoing
+            call"/"Ongoing video call" notification while
+            CONNECTING/CONNECTED, started and stopped entirely by
+            CallManager around the call's own lifecycle - never runs
+            otherwise. Declares both possible types; a given call only
+            requests the type flag(s) it actually needs at
+            startForeground time (see CallForegroundService).
+        -->
+        <service
+            android:name=".call.service.CallForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="microphone|camera" />
+
+    </application>
+</manifest>

@@ -1,0 +1,9 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base platform theme; actual Material 3 theming happens in
+         Compose (Theme.kt). This exists so the launcher/splash has a
+         non-flashing background before Compose takes over. -->
+    <style name="Theme.NoTrace" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/notrace_seed</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

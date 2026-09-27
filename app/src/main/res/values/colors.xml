@@ -1,0 +1,5 @@
+<resources>
+    <!-- Minimal seed colors; Material 3 dynamic/tonal palette is generated
+         in Theme.kt. Kept here only for the launcher icon background. -->
+    <color name="notrace_seed">#3D5AFE</color>
+</resources>
