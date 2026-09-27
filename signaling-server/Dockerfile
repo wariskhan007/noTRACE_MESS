@@ -1,17 +1,12 @@
 # NoTrace signaling server — Docker image for Render.com
 #
 # This packages ONLY the signaling-server/ folder. It does NOT (and
-# cannot) package the Android app itself — an APK is not a server
-# process, so it has nothing to run inside a container. This image is
-# the piece the Android app connects to over wss:// for WebRTC
-# signaling and offline message relay.
+# cannot) package the Android app itself.
 
-FROM node:20-alpine
+# Use Debian-based slim image to ensure compatibility with pre-built native modules
+FROM node:20-bookworm-slim
 
 WORKDIR /app
-
-# Install Python and build tools required by node-gyp to compile @signalapp/libsignal-client
-RUN apk add --no-cache python3 make g++
 
 # Install dependencies first so this layer is cached unless
 # package.json/package-lock.json change.
