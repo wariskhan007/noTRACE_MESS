@@ -19,22 +19,26 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+          
+      - name: Set up Android SDK
+        # Bringing this back to ensure the SDK environment is absolutely bulletproof
+        uses: android-actions/setup-android@v3
 
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
 
-      - name: Set up Gradle 8.7
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
 
-      - name: Build Debug APK
-        # Added -x lint to skip linting errors and increased memory allocation
-        run: gradle assembleDebug --no-daemon --stacktrace -x lint -Dorg.gradle.jvmargs="-Xmx2048m"
+      - name: Build Debug APK with Info Logging
+        # Added --info to expose the exact compilation, resource, or code error
+        run: gradle assembleDebug --no-daemon --stacktrace --info -x lint -Dorg.gradle.jvmargs="-Xmx2048m"
 
       - name: Show generated APK
         run: find app/build/outputs/apk -type f -name "*.apk" -print
