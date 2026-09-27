@@ -23,10 +23,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          
-      - name: Set up Android SDK
-        # Bringing this back to ensure the SDK environment is absolutely bulletproof
-        uses: android-actions/setup-android@v3
 
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
@@ -37,7 +33,6 @@ jobs:
           gradle-version: '8.7'
 
       - name: Build Debug APK with Info Logging
-        # Added --info to expose the exact compilation, resource, or code error
         run: gradle assembleDebug --no-daemon --stacktrace --info -x lint -Dorg.gradle.jvmargs="-Xmx2048m"
 
       - name: Show generated APK
